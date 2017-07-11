@@ -142,7 +142,33 @@ module Firebase
         process(:post, Config::SET_ACCOUNT_INFO, data)
       end
 
+      # Update user's profile
+      # Params:
+      #   @token: user's token
+      #   @user_name: User's new display name
+      #   @photo_url: User's new photo url
+      # Error
+      #   [INVALID_ID_TOKEN]
+      def update_profile(token, user_name, photo_url)
+        data = {
+          idToken: token, displayName: user_name,
+          photoUrl: photo_url, returnSecureToken: true
+        }
 
+        process(:post, Config::SET_ACCOUNT_INFO, data)
+      end
+
+      #
+      # Get account info
+      # Params:
+      #   @token: The Firebase ID token of the account
+      # Error
+      #   [INVALID_ID_TOKEN, USER_NOT_FOUND]
+      def get_account_info(token)
+        data = { idToken: token }
+
+        process(:post, Config::GET_ACCOUNT_INFO, data)
+      end
 
       private
       def process(verb, path, data=nil)
@@ -165,6 +191,6 @@ data = {
   email: "huyhung1994@gmail.com",
   password: "12345678"
 }
-rest = @firebase.change_password("eyJhbGciOiJSUzI1NiIsImtpZCI6ImFhYjNkMDliMjAyNmQyNDNkOWEzZWUwYzJkM2M1YzRhYTNiZTQwNTEifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZmlyLWF1dGgtZ2VtIiwiYXVkIjoiZmlyLWF1dGgtZ2VtIiwiYXV0aF90aW1lIjoxNDk5Nzc2OTU1LCJ1c2VyX2lkIjoieW0xcFQwVFBNOFhxdWw4SklUbTdZUDBxWHd4MiIsInN1YiI6InltMXBUMFRQTThYcXVsOEpJVG03WVAwcVh3eDIiLCJpYXQiOjE0OTk3NzY5NTUsImV4cCI6MTQ5OTc4MDU1NSwiZW1haWwiOiJodXlodW5nMTk5NEBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsiaHV5aHVuZzE5OTRAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.kdzK3oHa20jlsC7egudpDGZnvYn7UQPPgZbSsJ4WJSx4OUmwLB6kFfFzLZ50WJSsLN3YAZdJpjt7SiVmGPxFBx4F70g0-WWpJbdAhcunXE8U_6FgUCXW3q5VD_b7Z2qomi-cVuUEUW_GHZgwG_HfzWE822d6_37-xE3qV9k1IHFqbX6WDrz_7z3RKOnDX0u6O5lzYRKpswDZqhrCdj_lzcroqIdPBicfm--EtyycmFIpskoydjgKRPsG4HOKJUR-0Kf9Xy6AE4PYi_egkKWdAMMEVONHDXRPxQsbrH5kddpik2UsOueOOECeyG93yAnU2pkohduyjeoHiVEXycx6Eg", "kh0ngbiet123")
+rest = @firebase.get_account_info("eyJhbGciOiJSUzI1NiIsImtpZCI6ImFhYjNkMDliMjAyNmQyNDNkOWEzZWUwYzJkM2M1YzRhYTNiZTQwNTEifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZmlyLWF1dGgtZ2VtIiwiYXVkIjoiZmlyLWF1dGgtZ2VtIiwiYXV0aF90aW1lIjoxNDk5Nzc2OTY3LCJ1c2VyX2lkIjoieW0xcFQwVFBNOFhxdWw4SklUbTdZUDBxWHd4MiIsInN1YiI6InltMXBUMFRQTThYcXVsOEpJVG03WVAwcVh3eDIiLCJpYXQiOjE0OTk3NzY5NjcsImV4cCI6MTQ5OTc4MDU2NywiZW1haWwiOiJodXlodW5nMTk5NEBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsiaHV5aHVuZzE5OTRAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.lN0mYHZ6EMV4B3lmNP6DPjjYVcKFeuvE2WXlwFgN0Thc_gywB_8FArq2SnpmwMUF5jsM07HvGVaOysGoRz6DqmmUmneqG5riCMBzTXwkRvMwD6iKSn34x3ZViqpM81axp1gqe9mEWryfT-gMwjrTGinBFIMZUH-N158pQBWu6SQDnnAEZeY7J4st6m0Ha2ktAEiYDb_5_g-qGXU-KLrAXuKWyU42PJnLlqHfRuWMSCg-wzd0Tlke_yyD4e3bKrA_pOWoJxt600eIhNTVRg_d0COqXe7v8g5rXjSCOGXUpWEyXyaj7G8dDUbJnMCnT16gnTJJg_1SI0KGqQRqIN26eQ")
 puts rest.code
 puts rest

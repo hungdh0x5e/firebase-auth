@@ -17,8 +17,9 @@ describe Firebase::Auth do
   describe 'sign up with email' do
     it 'return data' do
       data = {
-        email: "huyhung1994@gmail.com",
-        password: "12345678"
+        email: "email_test@gmail.com",
+        password: "12345678",
+        returnSecureToken: true
       }
       expect(@firebase).to receive(:process).with(:post, Firebase::Auth::Config::SIGN_UP_EMAIL, data)
       @firebase.sign_up_email(data[:email], data[:password])
