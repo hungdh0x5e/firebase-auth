@@ -19,6 +19,7 @@ module Firebase
     end
 
     module Param
+      REFRESH_TOKEN = 'refresh_token'
       PASSWORD_RESET = 'PASSWORD_RESET'
       VERIFY_EMAIL = 'VERIFY_EMAIL'
     end

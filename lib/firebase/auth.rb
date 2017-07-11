@@ -60,7 +60,7 @@ module Firebase
       #   [OPERATION_NOT_ALLOWED, INVALID_IDP_RESPONSE]
       def sign_in_oauth(provider, access_token, request_uri)
         data = {
-          request_uri: request_uri,
+          requestUri: request_uri,
           postBody: "access_token=#{access_token}&providerId=#{provider}",
           returnSecureToken: true,
           returnIdpCredential: true
@@ -158,7 +158,6 @@ module Firebase
         process(:post, Config::SET_ACCOUNT_INFO, data)
       end
 
-      #
       # Get account info
       # Params:
       #   @token: The Firebase ID token of the account
@@ -168,6 +167,71 @@ module Firebase
         data = { idToken: token }
 
         process(:post, Config::GET_ACCOUNT_INFO, data)
+      end
+
+      # Link new account (email/ password) with user exist
+      # Param:
+      #   @token: token of main user
+      #   @email: user's email want link
+      #   @password: user's password want link
+      # Error
+      #   [CREDENTIAL_TOO_OLD_LOGIN_AGAIN, TOKEN_EXPIRED,
+      #     INVALID_ID_TOKEN, WEAK_PASSWORD]
+      def link_with_email(token, email, password)
+        data = {
+          idToken: token,
+          email: email, password: password,
+          returnSecureToken: true
+        }
+
+        process(:post, Config::SET_ACCOUNT_INFO, data)
+      end
+
+      # Link new account (email/ password) with user exist
+      # Param:
+      #   @token: token of main user
+      #   @email: user's email want link
+      #   @password: user's password want link
+      # Error
+      #   [CREDENTIAL_TOO_OLD_LOGIN_AGAIN, TOKEN_EXPIRED,
+      #     INVALID_ID_TOKEN, WEAK_PASSWORD]
+      def link_with_oauth(token, provider, access_token, redirect_uri)
+        data = {
+          idToken: token, requestUri: redirect_uri,
+          postBody: "id_token=#{access_token}&providerId=#{provider}",
+          returnSecureToken: true, returnIdpCredential: true
+        }
+
+        process(:post, Config::SET_ACCOUNT_INFO, data)
+      end
+
+      # Unlink between account
+      # Params:
+      #   @token: user's token want unlink
+      #   @providers: list of provider want unlink
+      # Error
+      #   [INVALID_ID_TOKEN]
+      def unlink_provider(token, providers=[])
+        data = { idToken: token, deleteProvider: providers }
+
+        process(:post, Config::SET_ACCOUNT_INFO, data)
+      end
+
+      def refresh_token(refresh_token)
+        data = {
+          grant_type: Param::REFRESH_TOKEN,
+          refresh_token: refresh_token
+        }
+
+        begin
+          RestClient::Request.execute(method: :post,
+                                    url: "#{Config::EXCHANGE_REFRESH_TOKEN}?key=#{api_key}",
+                                    headers: { 'Content-Type': 'application/json' },
+                                    payload: data.to_json,
+                                    timeout: 10)
+        rescue RestClient::ExceptionWithResponse => e
+          e.response
+        end
       end
 
       private
@@ -191,6 +255,12 @@ data = {
   email: "huyhung1994@gmail.com",
   password: "12345678"
 }
-rest = @firebase.get_account_info("eyJhbGciOiJSUzI1NiIsImtpZCI6ImFhYjNkMDliMjAyNmQyNDNkOWEzZWUwYzJkM2M1YzRhYTNiZTQwNTEifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZmlyLWF1dGgtZ2VtIiwiYXVkIjoiZmlyLWF1dGgtZ2VtIiwiYXV0aF90aW1lIjoxNDk5Nzc2OTY3LCJ1c2VyX2lkIjoieW0xcFQwVFBNOFhxdWw4SklUbTdZUDBxWHd4MiIsInN1YiI6InltMXBUMFRQTThYcXVsOEpJVG03WVAwcVh3eDIiLCJpYXQiOjE0OTk3NzY5NjcsImV4cCI6MTQ5OTc4MDU2NywiZW1haWwiOiJodXlodW5nMTk5NEBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsiaHV5aHVuZzE5OTRAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.lN0mYHZ6EMV4B3lmNP6DPjjYVcKFeuvE2WXlwFgN0Thc_gywB_8FArq2SnpmwMUF5jsM07HvGVaOysGoRz6DqmmUmneqG5riCMBzTXwkRvMwD6iKSn34x3ZViqpM81axp1gqe9mEWryfT-gMwjrTGinBFIMZUH-N158pQBWu6SQDnnAEZeY7J4st6m0Ha2ktAEiYDb_5_g-qGXU-KLrAXuKWyU42PJnLlqHfRuWMSCg-wzd0Tlke_yyD4e3bKrA_pOWoJxt600eIhNTVRg_d0COqXe7v8g5rXjSCOGXUpWEyXyaj7G8dDUbJnMCnT16gnTJJg_1SI0KGqQRqIN26eQ")
+
+access_token = "EAAZAU0aElvoEBAM5N4kzJBLZAYCKxBSVBBcaAnuOYhugBfsAR4aFNNSNjPsMLahSzF3d0gVMgDRBPjQHfOJUxzgY4QcxjtgZAOkuy6pKCTOPcgODEMsXjytXa0ZBQI5VJ0BY8XmHEwFfxQbZAHSZBrFSQNl68ZAPJaUjw7zHYLjhKWkeasfDGxhCtzoYluDTAjs71j8PuFMyuaiZBZCpoKhht"
+token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImFhYjNkMDliMjAyNmQyNDNkOWEzZWUwYzJkM2M1YzRhYTNiZTQwNTEifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZmlyLWF1dGgtZ2VtIiwibmFtZSI6IsSQ4buXIEh1eSBIw7luZyIsInBpY3R1cmUiOiJodHRwczovL3Njb250ZW50Lnh4LmZiY2RuLm5ldC92L3QxLjAtMS9wMTAweDEwMC8xNDA3OTQ4N18xMDI5OTIwNTY3MTI2NTM3XzkwOTkwMTgyMDMxNjk5NTc1MjBfbi5qcGc_b2g9NDQ4ZWU0MjUwZjM2NGNjNTVmMjlmODM0NmM1NjRjYTcmb2U9NUEwRjAzM0IiLCJhdWQiOiJmaXItYXV0aC1nZW0iLCJhdXRoX3RpbWUiOjE0OTk3NzkzNjEsInVzZXJfaWQiOiJFblJjWnhNb1RVZzhSaURLenFTRFpITUZWbHQyIiwic3ViIjoiRW5SY1p4TW9UVWc4UmlES3pxU0RaSE1GVmx0MiIsImlhdCI6MTQ5OTc4MDEyNiwiZXhwIjoxNDk5NzgzNzI2LCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImZhY2Vib29rLmNvbSI6WyIxMzQ5NDA5MTkxODQ0MzM4Il19LCJzaWduX2luX3Byb3ZpZGVyIjoiZmFjZWJvb2suY29tIn19.AS1sGQ57GlCsrdAfbgC_wcECc0B-V4s8MdrHbBro6BrWqtyA8W9B57tT-3ByBDPxO4h5cem3pU4L2MVk7cgsaShqDrPxdcTaLoB25GTVNiXuvwkm0ma0K9KBUwTLnc1_97Z4oAxKdggZh8euSVrIqrbPZ2HTVWJ_OzeiadCvuza5JF4b93in2RT7E5DfDM6in13BlBj57GEHzL4fowGHONH-6elXeeLM9HUGZHYuF-Cpz2Xdgedg4iVMFlW1nb8-Xu4Tb9xEyB8XyLSsjSj9oBHYkwp3EqXJJgo0Is5W10yibr-6HcLqz6x86REWJRz013LQzAinAxqWXaoEO6EEyg"
+
+refresh_token = "ACXxpGGBDebCHi4cgFYzkNF_A9siBASNqfpbWqkDViKrFoU6e4-LsOjP84VpnvKZ5_L_vYo9NgY_NtQMUg3XZvRWaJyz8y-U8h2gRU_Fut4ig8AO_VZp5hxLOp6gXmGPC2Ix4yPGIuhhM-ZlQPgGBCEDsI-Iy3SZ44fdBDSmhLqS3yMlq2JkXjrXEddxQk293rVzH3mjP9y4lhekq0f8Lewzzr-3_4sNltJaeZ23e2BYHzKnzOwBRbJasDeAw-L3PKMM2whRSexACXdNINySQz0pC7zhqAtb4iYFInvTP8HUOUShpQLUujllQ-iktIbEnPqUoke1ycAUYVlD8ekBQIgr3q6vdDeZjwv2AnWgPhOPE5ypTXHsrqrcYUUJ-q2_334dWEK1oJLhU6Iukvl7JXZlaNMOgdMe_RIcR_E81AfPd85kpfdb0EffSumhEhDC0g_T9HxLs-hJ"
+rest = @firebase.link_with_email(token, 'huyhung1994@gmail.com', 'kh0ngbiet')
 puts rest.code
-puts rest
+puts rest.headers
+puts rest.body
