@@ -217,6 +217,32 @@ module Firebase
         process(:post, Config::SET_ACCOUNT_INFO, data)
       end
 
+      # Confirm email verification
+      # Params:
+      #   @token: user's token
+      #  Error
+      #   [INVALID_ID_TOKEN, USER_NOT_FOUND]
+      def send_email_verify(token)
+        data = { idToken: token, requestType: Param::VERIFY_EMAIL }
+
+        process(:post, Config::SEND_CODE_CONFIRM, data)
+      end
+
+      # Error
+      #   [EXPIRED_OOB_CODE, INVALID_OOB_CODE,
+      #     USER_DISABLED, EMAIL_NOT_FOUND]
+      def confirm_email(code)
+        data = { oobCode: code }
+
+        process(:post, Config::SET_ACCOUNT_INFO, data)
+      end
+
+      def delete_account(token)
+        data = { idToken: token }
+
+        process(:post, Config::DELETE_ACCOUNT, data)
+      end
+
       def refresh_token(refresh_token)
         data = {
           grant_type: Param::REFRESH_TOKEN,
