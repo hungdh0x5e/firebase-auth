@@ -1,7 +1,7 @@
 module Firebase
   module Auth
     module Config
-      BASE_URI = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/'
+      BASE_URI = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty'
       VERIFY_TOKEN_VERSION = 'verifyCustomToken'
       EXCHANGE_REFRESH_TOKEN = 'https://securetoken.googleapis.com/v1/token'
       SIGN_UP_EMAIL = 'signupNewUser'
@@ -9,10 +9,11 @@ module Firebase
       SIGN_IN_OAUTH = 'verifyAssertion'
 
       SEND_CODE_CONFIRM = 'getOobConfirmationCode'
-      VERIFY_CODE_RESET_PWD = 'resetPassword'
+      RESET_PASSWORD = 'resetPassword'
 
       SET_ACCOUNT_INFO = 'setAccountInfo'
       GET_ACCOUNT_INFO = 'getAccountInfo'
+      GET_PROVIDERS_FOR_EMAIL = 'createAuthUri'
 
       DELETE_ACCOUNT = 'deleteAccount'
     end
