@@ -10,7 +10,6 @@ Gem::Specification.new do |spec|
   spec.email         = ["huyhung1994@gmail.com"]
 
   spec.summary       = "Firebase Authentication wrapper for Ruby"
-  spec.description   = "Firebase Authentication wrapper for Ruby"
   spec.homepage      = "https://github.com/hungdh0x5e/firebase-auth"
   spec.license       = "MIT"
 
@@ -24,5 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.13"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_runtime_dependency "rest-client"
+  spec.add_runtime_dependency "rest-client", "~> 2.0"
 end
