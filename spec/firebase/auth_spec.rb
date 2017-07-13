@@ -10,6 +10,16 @@ describe Firebase::Auth do
     expect{ Firebase::Auth::Client.new('') }.to raise_error(ArgumentError)
   end
 
+  it "defaults to the globally configured api_key" do
+    api_key = "Foo"
+
+    Firebase.configure do |config|
+      config.api_key = api_key
+    end
+
+    expect(Firebase::Auth::Client.new.api_key).to eq(api_key)
+  end
+
   before do
     @firebase = Firebase::Auth::Client.new('AIzaSyB4XAT6JK_JTzMjz7IHiIq7rlt7Yiah3co')
   end

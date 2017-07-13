@@ -1,5 +1,6 @@
 require 'firebase/auth/version'
 require 'firebase/auth/config'
+require 'firebase/configuration'
 require 'rest-client'
 require 'json'
 
@@ -8,7 +9,7 @@ module Firebase
     class Client
       attr_reader :api_key
 
-      def initialize(api_key)
+      def initialize(api_key=Firebase.configuration.api_key)
         raise ArgumentError.new('Missing api_key') if (api_key.nil? || api_key.empty?)
 
         @api_key = api_key
