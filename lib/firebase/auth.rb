@@ -1,6 +1,5 @@
-require_relative "auth/version"
-require_relative 'auth/response'
-require_relative 'auth/config'
+require 'firebase/auth/version'
+require 'firebase/auth/config'
 require 'rest-client'
 require 'json'
 
@@ -23,9 +22,11 @@ module Firebase
       #   [EMAIL_EXISTS, OPERATION_NOT_ALLOWED, TOO_MANY_ATTEMPTS_TRY_LATER]
       # Referrences:
       #   https://firebase.google.com/docs/reference/rest/auth/#section-create-email-password
-      def sign_up_email(email, password)
+      def sign_up_email(email, password, options={})
         data = {
-          email: email, password: password, returnSecureToken: true
+          email: email, password: password,
+          displayName: options[:display_name],
+          returnSecureToken: true
         }
         process(:post, Config::SIGN_UP_EMAIL, data)
       end
@@ -217,7 +218,7 @@ module Firebase
         process(:post, Config::SET_ACCOUNT_INFO, data)
       end
 
-      # Confirm email verification
+      # Send email verification
       # Params:
       #   @token: user's token
       #  Error
@@ -228,6 +229,9 @@ module Firebase
         process(:post, Config::SEND_CODE_CONFIRM, data)
       end
 
+      # Verify email by code
+      # Params:
+      #   @code:
       # Error
       #   [EXPIRED_OOB_CODE, INVALID_OOB_CODE,
       #     USER_DISABLED, EMAIL_NOT_FOUND]
@@ -260,6 +264,18 @@ module Firebase
         end
       end
 
+      # Additional Get certificate sign token (JWT)
+      def get_certificate
+        begin
+          res = RestClient::Request.execute(method: :get,
+                                    url: "#{Config::GET_CERTIFICATE}",
+                                    timeout: 10)
+          certificates = JSON.parse(res.body)
+        rescue RestClient::ExceptionWithResponse => e
+          e.response
+        end
+      end
+
       private
       def process(verb, path, data=nil)
         begin
@@ -275,18 +291,3 @@ module Firebase
     end
   end
 end
-
-@firebase = Firebase::Auth::Client.new('AIzaSyB4XAT6JK_JTzMjz7IHiIq7rlt7Yiah3co')
-data = {
-  email: "huyhung1994@gmail.com",
-  password: "12345678"
-}
-
-access_token = "EAAZAU0aElvoEBAM5N4kzJBLZAYCKxBSVBBcaAnuOYhugBfsAR4aFNNSNjPsMLahSzF3d0gVMgDRBPjQHfOJUxzgY4QcxjtgZAOkuy6pKCTOPcgODEMsXjytXa0ZBQI5VJ0BY8XmHEwFfxQbZAHSZBrFSQNl68ZAPJaUjw7zHYLjhKWkeasfDGxhCtzoYluDTAjs71j8PuFMyuaiZBZCpoKhht"
-token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImFhYjNkMDliMjAyNmQyNDNkOWEzZWUwYzJkM2M1YzRhYTNiZTQwNTEifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZmlyLWF1dGgtZ2VtIiwibmFtZSI6IsSQ4buXIEh1eSBIw7luZyIsInBpY3R1cmUiOiJodHRwczovL3Njb250ZW50Lnh4LmZiY2RuLm5ldC92L3QxLjAtMS9wMTAweDEwMC8xNDA3OTQ4N18xMDI5OTIwNTY3MTI2NTM3XzkwOTkwMTgyMDMxNjk5NTc1MjBfbi5qcGc_b2g9NDQ4ZWU0MjUwZjM2NGNjNTVmMjlmODM0NmM1NjRjYTcmb2U9NUEwRjAzM0IiLCJhdWQiOiJmaXItYXV0aC1nZW0iLCJhdXRoX3RpbWUiOjE0OTk3NzkzNjEsInVzZXJfaWQiOiJFblJjWnhNb1RVZzhSaURLenFTRFpITUZWbHQyIiwic3ViIjoiRW5SY1p4TW9UVWc4UmlES3pxU0RaSE1GVmx0MiIsImlhdCI6MTQ5OTc4MDEyNiwiZXhwIjoxNDk5NzgzNzI2LCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImZhY2Vib29rLmNvbSI6WyIxMzQ5NDA5MTkxODQ0MzM4Il19LCJzaWduX2luX3Byb3ZpZGVyIjoiZmFjZWJvb2suY29tIn19.AS1sGQ57GlCsrdAfbgC_wcECc0B-V4s8MdrHbBro6BrWqtyA8W9B57tT-3ByBDPxO4h5cem3pU4L2MVk7cgsaShqDrPxdcTaLoB25GTVNiXuvwkm0ma0K9KBUwTLnc1_97Z4oAxKdggZh8euSVrIqrbPZ2HTVWJ_OzeiadCvuza5JF4b93in2RT7E5DfDM6in13BlBj57GEHzL4fowGHONH-6elXeeLM9HUGZHYuF-Cpz2Xdgedg4iVMFlW1nb8-Xu4Tb9xEyB8XyLSsjSj9oBHYkwp3EqXJJgo0Is5W10yibr-6HcLqz6x86REWJRz013LQzAinAxqWXaoEO6EEyg"
-
-refresh_token = "ACXxpGGBDebCHi4cgFYzkNF_A9siBASNqfpbWqkDViKrFoU6e4-LsOjP84VpnvKZ5_L_vYo9NgY_NtQMUg3XZvRWaJyz8y-U8h2gRU_Fut4ig8AO_VZp5hxLOp6gXmGPC2Ix4yPGIuhhM-ZlQPgGBCEDsI-Iy3SZ44fdBDSmhLqS3yMlq2JkXjrXEddxQk293rVzH3mjP9y4lhekq0f8Lewzzr-3_4sNltJaeZ23e2BYHzKnzOwBRbJasDeAw-L3PKMM2whRSexACXdNINySQz0pC7zhqAtb4iYFInvTP8HUOUShpQLUujllQ-iktIbEnPqUoke1ycAUYVlD8ekBQIgr3q6vdDeZjwv2AnWgPhOPE5ypTXHsrqrcYUUJ-q2_334dWEK1oJLhU6Iukvl7JXZlaNMOgdMe_RIcR_E81AfPd85kpfdb0EffSumhEhDC0g_T9HxLs-hJ"
-rest = @firebase.link_with_email(token, 'huyhung1994@gmail.com', 'kh0ngbiet')
-puts rest.code
-puts rest.headers
-puts rest.body
