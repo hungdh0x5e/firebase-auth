@@ -255,13 +255,13 @@ module Firebase
         }
 
         begin
-          RestClient::Request.execute(method: :post,
+          Firebase::Auth::Response.new RestClient::Request.execute(method: :post,
                                     url: "#{Config::EXCHANGE_REFRESH_TOKEN}?key=#{api_key}",
                                     headers: { 'Content-Type': 'application/json' },
                                     payload: data.to_json,
                                     timeout: 10)
         rescue RestClient::ExceptionWithResponse => e
-          e.response
+          Firebase::Auth::Response.new e.response
         end
       end
 
@@ -273,20 +273,20 @@ module Firebase
                                     timeout: 10)
           certificates = JSON.parse(res.body)
         rescue RestClient::ExceptionWithResponse => e
-          e.response
+          Firebase::Auth::Response.new e.response
         end
       end
 
       private
       def process(verb, path, data=nil)
         begin
-          RestClient::Request.execute(method: verb,
+          Firebase::Auth::Response.new RestClient::Request.execute(method: verb,
                                     url: "#{Config::BASE_URI}/#{path}?key=#{api_key}",
                                     headers: { 'Content-Type': 'application/json' },
                                     payload: data.to_json,
                                     timeout: 10)
         rescue RestClient::ExceptionWithResponse => e
-          e.response
+          Firebase::Auth::Response.new e.response
         end
       end
     end
