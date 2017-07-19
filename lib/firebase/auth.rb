@@ -1,7 +1,7 @@
 require 'firebase/auth/version'
 require 'firebase/auth/config'
-require 'firebase/configuration'
 require 'firebase/auth/response'
+require 'firebase/configuration'
 require 'rest-client'
 require 'json'
 
@@ -20,7 +20,7 @@ module Firebase
       # Params:
       #   @email: The email for the user to create.
       #   @password: The password for the user to create.
-      # Error:
+      # Error: 
       #   [EMAIL_EXISTS, OPERATION_NOT_ALLOWED, TOO_MANY_ATTEMPTS_TRY_LATER]
       # Referrences:
       #   https://firebase.google.com/docs/reference/rest/auth/#section-create-email-password
