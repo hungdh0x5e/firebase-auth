@@ -1,6 +1,7 @@
 require 'firebase/auth/version'
 require 'firebase/auth/config'
 require 'firebase/configuration'
+require 'firebase/auth/response'
 require 'rest-client'
 require 'json'
 
